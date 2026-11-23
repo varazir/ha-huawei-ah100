@@ -12,15 +12,38 @@
           "gender": "Kön",
           "initial_weight": "Ungefärlig nuvarande vikt (kg)",
           "timeout_seconds": "Tidsgräns för mätfönster (sekunder)",
-          "user_id": "Användarplats på vågen (1-10)"
+          "user_id": "Användarplats på vågen (1-10)",
+          "google_health_enabled": "Koppla även Google Health (valfri molnsynk)"
         }
+      },
+      "pick_implementation": {
+        "title": "Välj Google Health OAuth2-inloggningsuppgifter"
+      },
+      "reconfigure": {
+        "title": "Google Health-synkronisering",
+        "description": "Koppla eller koppla bort valfri automatisk synkronisering av vikt och kroppsfett till Google Health.",
+        "menu_options": {
+          "connect_google_health": "Koppla / Återanslut Google Health",
+          "disconnect_google_health": "Koppla bort Google Health"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Logga in på Google Health igen",
+        "description": "Din Google Health-auktorisering har gått ut eller återkallats. Klicka på Skicka för att logga in igen."
       }
     },
     "error": {
       "invalid_mac": "Ogiltig Bluetooth MAC-adress (ange i formatet AA:BB:CC:DD:EE:FF)."
     },
     "abort": {
-      "already_configured": "Den här vågen och användarplatsen är redan konfigurerad."
+      "already_configured": "Den här vågen och användarplatsen är redan konfigurerad.",
+      "reconfigure_successful": "Google Health har kopplats.",
+      "google_health_disconnected": "Google Health har kopplats bort.",
+      "oauth_error": "Ogiltig tokendata mottogs från Google.",
+      "oauth_failed": "Fel vid hämtning av åtkomsttoken från Google Health.",
+      "oauth_timeout": "Tidsgränsen löpte ut vid kontakt med Google OAuth.",
+      "oauth_unauthorized": "Auktoriseringsfel från Google OAuth.",
+      "missing_credentials": "Lägg först till ditt Google Cloud OAuth2 Client ID & Secret under Inställningar → Enheter & tjänster → Programuppgifter."
     }
   },
   "options": {
@@ -48,6 +71,14 @@
     "button": {
       "start_measurement": {
         "name": "Starta mätning"
+      },
+      "push_to_google_health": {
+        "name": "Skicka till Google Health"
+      }
+    },
+    "switch": {
+      "google_health_auto_sync": {
+        "name": "Google Health Auto-synk"
       }
     },
     "sensor": {

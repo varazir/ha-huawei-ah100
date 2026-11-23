@@ -19,6 +19,7 @@ Instead of polling continuously in the background, you trigger a weigh-in on dem
   - `sensor.<name>_impedance` (`Ω`, `state_class: measurement`)
   - `sensor.<name>_status` (`idle`, `searching`, `connected`, `measuring`, `complete`, `timeout`)
 - **Start Measurement Button:** `button.<name>_start_measurement` — trigger from any Zigbee button, Wear OS / Apple Watch tile, or dashboard card.
+- **Optional Google Health Sync (Cloud Push):** Optionally link your Google Cloud OAuth2 credentials to automatically (or manually) push weight and body fat % to the **Google Health API v4** (`switch.<name>_google_health_auto_sync` and `button.<name>_push_to_google_health`).
 - **Guided Weigh-In Blueprint:** Optional automation blueprint that announces *"Searching"*, *"Connected – step on scale"*, and *"Measurement complete"* on a Google Mini / Sonos speaker and sends watch notifications.
 
 ## Installation (HACS / Marketplace)
@@ -41,6 +42,17 @@ Use the included blueprint (`blueprints/automation/huawei_ah100_guided_weigh_in.
 3. Briefly tap the scale with your foot to wake it up.
 4. As soon as Bluetooth connects and unlocks, the speaker announces: *"Scale connected. Step onto the scale now."*
 5. Step onto the scale — once weight and body fat finish, your measurements are saved permanently and announced aloud.
+
+## Optional: Push Measurements to Google Health
+
+You can optionally push your weight (`weightGrams`) and body fat (`percentage`) to **Google Health** using the official **Google Health API v4** (`health.googleapis.com/v4`):
+
+1. In [Google Cloud Console](https://console.cloud.google.com/), ensure the **Google Health API** is enabled and you have a Web Application **OAuth 2.0 Client ID & Secret** with redirect URI `https://my.home-assistant.io/redirect/oauth`.
+2. In Home Assistant, go to **Settings → Devices & Services → Application Credentials** (top-right `⋮` menu) and add your Client ID & Secret for **Huawei AH100 / Honor CH100 Scale**.
+3. Either check **Also connect Google Health** during initial setup, or click **`⋮` → Reconfigure → Connect / Reconnect Google Health** on your existing scale entry.
+4. Once connected, two new entities appear on your scale device:
+   - **`switch.<name>_google_health_auto_sync`**: Automatically push weight & body fat after every completed weigh-in (includes `last_sync` and `last_error` attributes).
+   - **`button.<name>_push_to_google_health`**: Manually push the latest measurement on demand.
 
 ## Credits
 

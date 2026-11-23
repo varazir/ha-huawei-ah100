@@ -7,18 +7,44 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_entry_oauth2_flow
 
 from .const import DOMAIN
 from .coordinator import HuaweiAH100Coordinator
+from .google_health import GoogleHealthClient
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BUTTON]
+PLATFORMS: list[Platform] = [Platform.SENSOR, Platform.BUTTON, Platform.SWITCH]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up Huawei AH100 Scale from a config entry."""
-    coordinator = HuaweiAH100Coordinator(hass, entry)
+    google_health_client: GoogleHealthClient | None = None
+
+    if "token" in entry.data and "auth_implementation" in entry.data:
+        try:
+            implementation = (
+                await config_entry_oauth2_flow.async_get_config_entry_implementation(
+                    hass, entry
+                )
+            )
+            oauth_session = config_entry_oauth2_flow.OAuth2Session(
+                hass, entry, implementation
+            )
+            google_health_client = GoogleHealthClient(oauth_session)
+            _LOGGER.info("Google Health sync enabled for %s", entry.title)
+        except Exception as err:
+            _LOGGER.warning(
+                "Could not initialize Google Health OAuth2 session for %s: %s. "
+                "Local Bluetooth scale measurements will continue to work normally.",
+                entry.title,
+                err,
+            )
+
+    coordinator = HuaweiAH100Coordinator(
+        hass, entry, google_health_client=google_health_client
+    )
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

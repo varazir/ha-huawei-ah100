@@ -11,6 +11,16 @@ CONF_GENDER = "gender"
 CONF_INITIAL_WEIGHT = "initial_weight"
 CONF_TIMEOUT_SECONDS = "timeout_seconds"
 CONF_USER_ID = "user_id"
+CONF_GOOGLE_HEALTH_ENABLED = "google_health_enabled"
+CONF_GOOGLE_HEALTH_AUTO_SYNC = "google_health_auto_sync"
+
+# Google Health API v4 (optional cloud push)
+GOOGLE_HEALTH_AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_HEALTH_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_HEALTH_API_BASE = "https://health.googleapis.com/v4/users/me/dataTypes"
+GOOGLE_HEALTH_WRITE_SCOPE = (
+    "https://www.googleapis.com/auth/googlehealth.health_metrics_and_measurements.writeonly"
+)
 
 # Defaults
 DEFAULT_USER_NAME = "Huawei Scale"

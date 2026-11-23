@@ -12,15 +12,38 @@
           "gender": "Gender",
           "initial_weight": "Approximate current weight (kg)",
           "timeout_seconds": "Measurement window timeout (seconds)",
-          "user_id": "Scale User Slot (1-10)"
+          "user_id": "Scale User Slot (1-10)",
+          "google_health_enabled": "Also connect Google Health (optional cloud sync)"
         }
+      },
+      "pick_implementation": {
+        "title": "Select Google Health OAuth2 Credentials"
+      },
+      "reconfigure": {
+        "title": "Google Health Sync",
+        "description": "Connect or disconnect optional automatic weight and body fat sync to Google Health.",
+        "menu_options": {
+          "connect_google_health": "Connect / Reconnect Google Health",
+          "disconnect_google_health": "Disconnect Google Health"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Re-authenticate Google Health",
+        "description": "Your Google Health authorization has expired or been revoked. Click Submit to sign in again."
       }
     },
     "error": {
       "invalid_mac": "Invalid Bluetooth MAC address format (expected AA:BB:CC:DD:EE:FF)."
     },
     "abort": {
-      "already_configured": "This scale and user slot is already configured."
+      "already_configured": "This scale and user slot is already configured.",
+      "reconfigure_successful": "Google Health connected successfully.",
+      "google_health_disconnected": "Google Health has been disconnected.",
+      "oauth_error": "Received invalid token data from Google.",
+      "oauth_failed": "Error while obtaining Google Health access token.",
+      "oauth_timeout": "Timed out resolving Google OAuth token.",
+      "oauth_unauthorized": "Google OAuth authorization error.",
+      "missing_credentials": "Add your Google Cloud OAuth2 Client ID & Secret in Settings → Devices & Services → Application Credentials first."
     }
   },
   "options": {
@@ -48,6 +71,14 @@
     "button": {
       "start_measurement": {
         "name": "Start Measurement"
+      },
+      "push_to_google_health": {
+        "name": "Push to Google Health"
+      }
+    },
+    "switch": {
+      "google_health_auto_sync": {
+        "name": "Google Health Auto-Sync"
       }
     },
     "sensor": {

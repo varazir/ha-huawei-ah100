@@ -3,7 +3,7 @@
   "name": "Huawei AH100 / Honor CH100 Scale",
   "codeowners": ["@Varazir"],
   "config_flow": true,
-  "dependencies": ["bluetooth_adapters"],
+  "dependencies": ["bluetooth_adapters", "application_credentials"],
   "documentation": "https://github.com/Varazir/ha-huawei-ah100",
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/Varazir/ha-huawei-ah100/issues",
@@ -18,5 +18,5 @@
     {"local_name": "HUAWEI AH100*"},
     {"local_name": "HONOR CH100*"}
   ],
-  "version": "1.0.0"
+  "version": "1.1.0"
 }

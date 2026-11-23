@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Callable
+from datetime import datetime
 import logging
 from typing import Any
 
@@ -31,6 +32,11 @@ from .const import (
     STATUS_SEARCHING,
     STATUS_TIMEOUT,
 )
+from .google_health import (
+    GoogleHealthAuthError,
+    GoogleHealthClient,
+    GoogleHealthError,
+)
 from .scale import ScaleMeasurement, ScaleUserProfile, read_scale_measurement
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,12 +45,18 @@ _LOGGER = logging.getLogger(__name__)
 class HuaweiAH100Coordinator:
     """Manages on-demand BLE measurement sessions and pushes updates to entities."""
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        google_health_client: GoogleHealthClient | None = None,
+    ) -> None:
         """Initialize the coordinator."""
         self.hass = hass
         self.entry = entry
         self.mac_address: str = entry.data[CONF_MAC_ADDRESS].upper()
         self.user_name: str = entry.data.get(CONF_USER_NAME, DEFAULT_USER_NAME)
+        self.google_health_client = google_health_client
 
         self.status: str = STATUS_IDLE
         self.weight_kg: float | None = None
@@ -52,9 +64,18 @@ class HuaweiAH100Coordinator:
         self.body_fat_pct: float | None = None
         self.impedance_ohm: int | None = None
 
+        self.google_health_auto_sync: bool = True
+        self.last_google_health_sync: str | None = None
+        self.last_google_health_error: str | None = None
+
         self._listeners: list[Callable[[], None]] = []
         self._measure_lock = asyncio.Lock()
         self._reset_task: asyncio.Task[Any] | None = None
+
+    @property
+    def google_health_connected(self) -> bool:
+        """Return True if Google Health OAuth2 is configured for this entry."""
+        return self.google_health_client is not None
 
     @property
     def height_cm(self) -> int:
@@ -111,6 +132,13 @@ class HuaweiAH100Coordinator:
             self._async_notify_listeners()
 
     @callback
+    def set_google_health_auto_sync(self, enabled: bool) -> None:
+        """Enable or disable automatic Google Health sync after measurements."""
+        if self.google_health_auto_sync != enabled:
+            self.google_health_auto_sync = enabled
+            self._async_notify_listeners()
+
+    @callback
     def restore_value(self, key: str, value: float | int) -> None:
         """Restore persisted sensor values on HA startup so USER_INFO has the last weight."""
         if key == "weight_kg" and self.weight_kg is None:
@@ -121,6 +149,43 @@ class HuaweiAH100Coordinator:
             self.body_fat_pct = float(value)
         elif key == "impedance_ohm" and self.impedance_ohm is None:
             self.impedance_ohm = int(value)
+
+    async def async_push_to_google_health(
+        self, measured_at: datetime | None = None
+    ) -> bool:
+        """Push the current weight (and body fat if available) to Google Health."""
+        if self.google_health_client is None:
+            _LOGGER.warning("Google Health is not connected for %s", self.user_name)
+            return False
+
+        if self.weight_kg is None or self.weight_kg <= 0:
+            _LOGGER.warning(
+                "No valid weight measurement available to push to Google Health for %s",
+                self.user_name,
+            )
+            return False
+
+        try:
+            result = await self.google_health_client.async_push_measurement(
+                weight_kg=self.weight_kg,
+                body_fat_pct=self.body_fat_pct,
+                measured_at=measured_at,
+            )
+            self.last_google_health_sync = result["timestamp"]
+            self.last_google_health_error = None
+            self._async_notify_listeners()
+            return True
+        except GoogleHealthAuthError as err:
+            self.last_google_health_error = str(err)
+            _LOGGER.error("Google Health authentication failed: %s", err)
+            self._async_notify_listeners()
+            self.entry.async_start_reauth(self.hass)
+            return False
+        except GoogleHealthError as err:
+            self.last_google_health_error = str(err)
+            _LOGGER.error("Google Health sync failed: %s", err)
+            self._async_notify_listeners()
+            return False
 
     async def async_start_measurement(self, timeout_override: int | None = None) -> ScaleMeasurement | None:
         """Run an on-demand measurement window against the scale."""
@@ -174,6 +239,9 @@ class HuaweiAH100Coordinator:
                     self.body_fat_pct,
                     self.impedance_ohm,
                 )
+
+                if self.google_health_connected and self.google_health_auto_sync:
+                    self.hass.async_create_task(self.async_push_to_google_health())
             else:
                 self.set_status(STATUS_TIMEOUT)
                 _LOGGER.warning("Measurement timed out for %s", self.mac_address)
