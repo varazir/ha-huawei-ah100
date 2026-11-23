@@ -1,9 +1,10 @@
 blueprint:
   name: Huawei AH100 Guided Weigh-In (Voice & Watch Notifications)
   description: >
-    Announces weigh-in progress (searching, Bluetooth connected, measurement complete,
-    or timeout) on a speaker via TTS and/or sends notifications to a watch or phone
-    whenever your Huawei AH100 / Honor CH100 scale status changes.
+    Optionally starts a Huawei AH100 / Honor CH100 weigh-in from a physical button
+    (event entity, input_button, or ZHA remote) and announces progress (searching,
+    Bluetooth connected, measurement complete, or timeout) on a speaker via TTS
+    and/or sends notifications to a smartwatch or phone.
   domain: automation
   author: Varazir
   source_url: https://github.com/Varazir/ha-huawei-ah100/blob/main/blueprints/automation/huawei_ah100_guided_weigh_in.yaml
@@ -14,6 +15,14 @@ blueprint:
       name: Scale Entities
       icon: mdi:scale-bathroom
       input:
+        start_button:
+          name: Scale Start Measurement Button (Optional)
+          description: The Start Measurement button from the Huawei AH100 integration (required only if using a Start Trigger below).
+          default: ""
+          selector:
+            entity:
+              domain: button
+              integration: huawei_ah100
         status_sensor:
           name: Scale Status Sensor
           description: The Status sensor created by the Huawei AH100 integration.
@@ -40,6 +49,33 @@ blueprint:
             entity:
               domain: sensor
               integration: huawei_ah100
+    activation:
+      name: Start Weigh-In Trigger (Optional)
+      icon: mdi:gesture-tap-button
+      collapsed: true
+      input:
+        trigger_entity:
+          name: Button / Event Entity
+          description: Optional event.* (Matter/Hue/etc.) or input_button.* entity that starts a weigh-in.
+          default: []
+          selector:
+            entity:
+              domain:
+                - event
+                - input_button
+              multiple: true
+        zha_device_ieee:
+          name: ZHA Remote IEEE Address (e.g. IKEA TRADFRI)
+          description: Optional Zigbee IEEE address (e.g. 90:fd:9f:ff:fe:e8:00:4b) for a ZHA remote.
+          default: ""
+          selector:
+            text: {}
+        zha_command:
+          name: ZHA Button Command
+          description: ZHA event command name (e.g. toggle, on, off).
+          default: "toggle"
+          selector:
+            text: {}
     notifications:
       name: Speaker & Watch Notifications
       icon: mdi:bullhorn
@@ -100,7 +136,12 @@ mode: queued
 max: 5
 max_exceeded: silent
 
+trigger_variables:
+  zha_ieee: !input zha_device_ieee
+  zha_cmd: !input zha_command
+
 variables:
+  start_button: !input start_button
   enable_tts: !input enable_tts
   tts_entity: !input tts_entity
   speaker_entity: !input speaker_entity
@@ -114,6 +155,16 @@ variables:
   msg_timeout: !input msg_timeout
 
 triggers:
+  - trigger: state
+    id: start_by_entity
+    entity_id: !input trigger_entity
+  - trigger: event
+    id: start_by_zha
+    event_type: zha_event
+    event_data:
+      device_ieee: !input zha_device_ieee
+      command: !input zha_command
+    enabled: "{{ zha_ieee != '' }}"
   - trigger: state
     id: searching
     entity_id: !input status_sensor
@@ -132,6 +183,20 @@ triggers:
     to: "timeout"
 
 actions:
+  - if:
+      - condition: trigger
+        id:
+          - start_by_entity
+          - start_by_zha
+    then:
+      - if:
+          - "{{ start_button != '' }}"
+        then:
+          - action: button.press
+            target:
+              entity_id: "{{ start_button }}"
+      - stop: "Triggered scale measurement"
+
   - variables:
       current_message: >
         {% if trigger.id == 'searching' %}
