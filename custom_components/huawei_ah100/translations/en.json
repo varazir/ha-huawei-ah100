@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Huawei AH100 / Honor CH100 Smart Scale",
+        "description": "Enter your scale Bluetooth MAC address and user profile (required by the scale to compute body fat % and impedance).",
+        "data": {
+          "mac_address": "Scale Bluetooth MAC address",
+          "user_name": "Device / Profile name",
+          "height_cm": "Height (cm)",
+          "age": "Age",
+          "gender": "Gender",
+          "initial_weight": "Approximate current weight (kg)",
+          "timeout_seconds": "Measurement window timeout (seconds)",
+          "user_id": "Scale User Slot (1-10)"
+        }
+      }
+    },
+    "error": {
+      "invalid_mac": "Invalid Bluetooth MAC address format (expected AA:BB:CC:DD:EE:FF)."
+    },
+    "abort": {
+      "already_configured": "This scale and user slot is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Update User Profile & Settings",
+        "data": {
+          "height_cm": "Height (cm)",
+          "age": "Age",
+          "gender": "Gender",
+          "timeout_seconds": "Measurement window timeout (seconds)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "gender": {
+      "options": {
+        "male": "Male",
+        "female": "Female"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "start_measurement": {
+        "name": "Start Measurement"
+      }
+    },
+    "sensor": {
+      "weight": {
+        "name": "Weight"
+      },
+      "bmi": {
+        "name": "BMI"
+      },
+      "body_fat": {
+        "name": "Body Fat"
+      },
+      "impedance": {
+        "name": "Impedance"
+      },
+      "status": {
+        "name": "Status",
+        "state": {
+          "idle": "Idle",
+          "searching": "Searching for scale",
+          "connected": "Connected - step on scale",
+          "measuring": "Measuring",
+          "complete": "Complete",
+          "timeout": "Timed out"
+        }
+      }
+    }
+  }
+}

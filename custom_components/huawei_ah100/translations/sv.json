@@ -1,0 +1,79 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Huawei AH100 / Honor CH100 Smart Våg",
+        "description": "Ange vågens Bluetooth MAC-adress och din användarprofil (krävs av vågen för att beräkna kroppsfett % och impedans).",
+        "data": {
+          "mac_address": "Vågens Bluetooth MAC-adress",
+          "user_name": "Enhets- / Profilnamn",
+          "height_cm": "Längd (cm)",
+          "age": "Ålder",
+          "gender": "Kön",
+          "initial_weight": "Ungefärlig nuvarande vikt (kg)",
+          "timeout_seconds": "Tidsgräns för mätfönster (sekunder)",
+          "user_id": "Användarplats på vågen (1-10)"
+        }
+      }
+    },
+    "error": {
+      "invalid_mac": "Ogiltig Bluetooth MAC-adress (ange i formatet AA:BB:CC:DD:EE:FF)."
+    },
+    "abort": {
+      "already_configured": "Den här vågen och användarplatsen är redan konfigurerad."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Uppdatera användarprofil och inställningar",
+        "data": {
+          "height_cm": "Längd (cm)",
+          "age": "Ålder",
+          "gender": "Kön",
+          "timeout_seconds": "Tidsgräns för mätfönster (sekunder)"
+        }
+      }
+    }
+  },
+  "selector": {
+    "gender": {
+      "options": {
+        "male": "Man",
+        "female": "Kvinna"
+      }
+    }
+  },
+  "entity": {
+    "button": {
+      "start_measurement": {
+        "name": "Starta mätning"
+      }
+    },
+    "sensor": {
+      "weight": {
+        "name": "Vikt"
+      },
+      "bmi": {
+        "name": "BMI"
+      },
+      "body_fat": {
+        "name": "Kroppsfett"
+      },
+      "impedance": {
+        "name": "Impedans"
+      },
+      "status": {
+        "name": "Status",
+        "state": {
+          "idle": "Viloläge",
+          "searching": "Söker efter vågen",
+          "connected": "Ansluten - kliv upp på vågen",
+          "measuring": "Mäter",
+          "complete": "Klar",
+          "timeout": "Tidsgränsen löpte ut"
+        }
+      }
+    }
+  }
+}

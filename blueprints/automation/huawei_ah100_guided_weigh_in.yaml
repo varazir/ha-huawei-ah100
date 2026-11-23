@@ -1,0 +1,172 @@
+blueprint:
+  name: Huawei AH100 Guided Weigh-In (Voice & Watch Notifications)
+  description: >
+    Announces weigh-in progress (searching, Bluetooth connected, measurement complete,
+    or timeout) on a speaker via TTS and/or sends notifications to a watch or phone
+    whenever your Huawei AH100 / Honor CH100 scale status changes.
+  domain: automation
+  author: Varazir
+  source_url: https://github.com/Varazir/ha-huawei-ah100/blob/main/blueprints/automation/huawei_ah100_guided_weigh_in.yaml
+  homeassistant:
+    min_version: "2024.10.0"
+  input:
+    scale_entities:
+      name: Scale Entities
+      icon: mdi:scale-bathroom
+      input:
+        status_sensor:
+          name: Scale Status Sensor
+          description: The Status sensor created by the Huawei AH100 integration.
+          selector:
+            entity:
+              domain: sensor
+              integration: huawei_ah100
+        weight_sensor:
+          name: Scale Weight Sensor
+          selector:
+            entity:
+              domain: sensor
+              device_class: weight
+              integration: huawei_ah100
+        bmi_sensor:
+          name: Scale BMI Sensor
+          selector:
+            entity:
+              domain: sensor
+              integration: huawei_ah100
+        body_fat_sensor:
+          name: Scale Body Fat Sensor
+          selector:
+            entity:
+              domain: sensor
+              integration: huawei_ah100
+    notifications:
+      name: Speaker & Watch Notifications
+      icon: mdi:bullhorn
+      input:
+        enable_tts:
+          name: Enable Voice Announcements (TTS)
+          default: true
+          selector:
+            boolean: {}
+        tts_entity:
+          name: TTS Engine
+          description: Select your Home Assistant TTS entity (e.g. Google AI TTS or Google Translate).
+          default: ""
+          selector:
+            entity:
+              domain: tts
+        speaker_entity:
+          name: Speaker (Media Player)
+          description: Google Mini / Nest / Sonos speaker to announce weigh-in instructions.
+          default: ""
+          selector:
+            entity:
+              domain: media_player
+        enable_notify:
+          name: Enable Watch / Mobile Notification
+          default: false
+          selector:
+            boolean: {}
+        notify_entity:
+          name: Watch / Mobile Notify Entity
+          description: Select a notify entity (e.g. Pixel Watch or Mobile App).
+          default: ""
+          selector:
+            entity:
+              domain: notify
+    messages:
+      name: Custom Messages
+      icon: mdi:message-text
+      collapsed: true
+      input:
+        msg_searching:
+          name: Searching message
+          default: "Searching for scale. Tap the scale to wake it up."
+          selector:
+            text: {}
+        msg_connected:
+          name: Connected message
+          default: "Scale connected. Step onto the scale now."
+          selector:
+            text: {}
+        msg_timeout:
+          name: Timeout message
+          default: "Weigh-in timed out without receiving a measurement."
+          selector:
+            text: {}
+
+mode: queued
+max: 5
+max_exceeded: silent
+
+variables:
+  enable_tts: !input enable_tts
+  tts_entity: !input tts_entity
+  speaker_entity: !input speaker_entity
+  enable_notify: !input enable_notify
+  notify_entity: !input notify_entity
+  weight_sensor: !input weight_sensor
+  bmi_sensor: !input bmi_sensor
+  body_fat_sensor: !input body_fat_sensor
+  msg_searching: !input msg_searching
+  msg_connected: !input msg_connected
+  msg_timeout: !input msg_timeout
+
+triggers:
+  - trigger: state
+    id: searching
+    entity_id: !input status_sensor
+    to: "searching"
+  - trigger: state
+    id: connected
+    entity_id: !input status_sensor
+    to: "connected"
+  - trigger: state
+    id: complete
+    entity_id: !input status_sensor
+    to: "complete"
+  - trigger: state
+    id: timeout
+    entity_id: !input status_sensor
+    to: "timeout"
+
+actions:
+  - variables:
+      current_message: >
+        {% if trigger.id == 'searching' %}
+          {{ msg_searching }}
+        {% elif trigger.id == 'connected' %}
+          {{ msg_connected }}
+        {% elif trigger.id == 'complete' %}
+          {% set w = states(weight_sensor) %}
+          {% set bmi = states(bmi_sensor) %}
+          {% set fat = states(body_fat_sensor) %}
+          {% if has_value(body_fat_sensor) %}
+            Measurement complete. Weight {{ w }} kg, BMI {{ bmi }}, body fat {{ fat }} percent.
+          {% else %}
+            Measurement complete. Weight {{ w }} kg, BMI {{ bmi }}.
+          {% endif %}
+        {% else %}
+          {{ msg_timeout }}
+        {% endif %}
+  - if:
+      - "{{ enable_tts and tts_entity != '' and speaker_entity != '' }}"
+    then:
+      - action: tts.speak
+        continue_on_error: true
+        target:
+          entity_id: "{{ tts_entity }}"
+        data:
+          media_player_entity_id: "{{ speaker_entity }}"
+          message: "{{ current_message }}"
+  - if:
+      - "{{ enable_notify and notify_entity != '' }}"
+    then:
+      - action: notify.send_message
+        continue_on_error: true
+        target:
+          entity_id: "{{ notify_entity }}"
+        data:
+          title: "Huawei Scale"
+          message: "{{ current_message }}"
