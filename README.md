@@ -61,6 +61,10 @@ Portions of the Huawei AH100 / Honor CH100 BLE wire protocol implementation — 
 - `BluetoothHuaweiAH100.java` (v2.5.4) — Copyright (C) 2014 `olie.xdev`
 - `HuaweiAhCh100Handler.kt`, `HuaweiAhCh100HandlerTest.kt`, and `HuaweiUserRecordWireTest.kt` — Copyright (C) 2026 openScale contributors
 
+### AI Assistance Disclosure
+
+For transparency, this integration, its blueprint, and tests were developed with AI assistance using **Google Antigravity** (powered by **Gemini**), with live hardware testing and verification performed on a physical Huawei AH100 scale running on Home Assistant OS.
+
 ## License
 
 In compliance with openScale's open-source license, this project is licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**. See [LICENSE](LICENSE) for full details.
