@@ -1,7 +1,11 @@
 """Unit tests for Huawei AH100 / Honor CH100 wire protocol primitives.
 
-Uses the verified fixtures and real hardware captures from openScale's
-HuaweiAhCh100HandlerTest and HuaweiUserRecordWireTest.
+SPDX-License-Identifier: GPL-3.0-or-later
+
+Uses verified test fixtures and real hardware captures from openScale
+(https://github.com/oliexdev/openScale, GPL-3.0-or-later):
+  - HuaweiAhCh100HandlerTest
+  - HuaweiUserRecordWireTest
 """
 
 import importlib.util

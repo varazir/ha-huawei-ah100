@@ -1,4 +1,11 @@
-"""Constants for the Huawei AH100 / Honor CH100 Scale integration."""
+"""Constants for the Huawei AH100 / Honor CH100 Scale integration.
+
+SPDX-License-Identifier: GPL-3.0-or-later
+
+BLE GATT UUIDs, AES-128-CTR initial key/IV, and command/notification opcodes
+are derived from openScale (https://github.com/oliexdev/openScale), licensed
+under the GNU General Public License v3.0 or later.
+"""
 
 DOMAIN = "huawei_ah100"
 

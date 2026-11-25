@@ -1,7 +1,14 @@
 """BLE protocol implementation for Huawei AH100 / Honor CH100 smart scales.
 
-Based on openScale's v2.5.4 BluetoothHuaweiAH100.java and HuaweiAhCh100Handler.kt
-(including the issue #1449 USER_INFO length byte fix and v2.5.4 2-second heartbeat).
+SPDX-License-Identifier: GPL-3.0-or-later
+
+Portions of the BLE wire protocol (XOR obfuscation, AES-128-CTR session key
+derivation, frame encoding/decoding, CMD_USER_INFO length quirk from issue #1449,
+and 2-second heartbeat keep-alive) are derived from openScale:
+  - https://github.com/oliexdev/openScale
+  - BluetoothHuaweiAH100.java (v2.5.4), Copyright (C) 2014 olie.xdev
+  - HuaweiAhCh100Handler.kt, Copyright (C) 2026 openScale contributors
+Licensed under the GNU General Public License v3.0 or later.
 """
 
 from __future__ import annotations

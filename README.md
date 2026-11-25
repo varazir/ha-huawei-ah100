@@ -1,7 +1,7 @@
 # Huawei AH100 / Honor CH100 Smart Scale for Home Assistant
 
 [![HACS / Marketplace Custom](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://github.com/hacs/integration)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 On-demand Bluetooth Low Energy (BLE) custom integration for **Huawei AH100** and **Honor CH100** smart body-fat scales (Chipsea CST34M97 chipset) in Home Assistant OS.
 
@@ -54,6 +54,13 @@ You can optionally push your weight (`weightGrams`) and body fat (`percentage`) 
    - **`switch.<name>_google_health_auto_sync`**: Automatically push weight & body fat after every completed weigh-in (includes `last_sync` and `last_error` attributes).
    - **`button.<name>_push_to_google_health`**: Manually push the latest measurement on demand.
 
-## Credits
+## Credits & Open-Source Attribution
 
-Wire protocol (XOR obfuscation, AES-128-CTR decryption, `CMD_USER_INFO` length quirk, and 2-second heartbeat) is based on the reverse-engineering work in [openScale](https://github.com/oliexdev/openScale) (`BluetoothHuaweiAH100.java` v2.5.4 and `HuaweiAhCh100Handler.kt`).
+Portions of the Huawei AH100 / Honor CH100 BLE wire protocol implementation — including GATT UUIDs, XOR obfuscation, AES-128-CTR key derivation and decryption, command/notification opcodes, the `CMD_USER_INFO` length-byte quirk (issue #1449), the 2-second heartbeat keep-alive, and protocol test fixtures — are derived from **[openScale](https://github.com/oliexdev/openScale)**:
+
+- `BluetoothHuaweiAH100.java` (v2.5.4) — Copyright (C) 2014 `olie.xdev`
+- `HuaweiAhCh100Handler.kt`, `HuaweiAhCh100HandlerTest.kt`, and `HuaweiUserRecordWireTest.kt` — Copyright (C) 2026 openScale contributors
+
+## License
+
+In compliance with openScale's open-source license, this project is licensed under the **GNU General Public License v3.0 or later (GPL-3.0-or-later)**. See [LICENSE](LICENSE) for full details.
